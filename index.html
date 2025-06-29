@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEPaint</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="paint">
+        <div id="topbar">
+            <div class="topbar-btn" id="filebtn" onclick="openDropdown(this,event,'filedropdown')">File</div>
+            <div class="topbar-btn selected">Start</div>
+            <div class="topbar-btn">View</div>
+        </div>
+        <div id="toolbar" class="tooltab">
+            <div style="margin-left:0.6em" id="imgmbox">
+                <div class="bigbox tool pevents" data-mode="select" data-modeoptions="|select|selectShape|" id="selbtn">
+                    <div id="seldisplay">
+                        <svg viewBox="-1 -1 12 12" id="selsvg">
+                            <rect y="1" width="10" height="8"></rect>
+                        </svg>
+                    </div>
+                    <div id="selselect" onclick="openDropdown(this,event,'seldrop')">
+                        Select<br>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="dropdown hidden" id="seldrop">
+                    <div class="dropdowntitle">Selection shapes</div>
+                    <div class="dropdownitem" data-modename="select" onclick="setSelMode('select')">
+                        <div class="dropdownicon">
+                            <svg viewBox="-1 -1 12 12">
+                                <rect y="1" width="10" height="8"></rect>
+                            </svg>
+                        </div>
+                        Rectangular
+                    </div>
+                    <div class="dropdownitem" data-modename="selectShape" onclick="setSelMode('selectShape')">
+                        <div class="dropdownicon">
+                            <svg viewBox="-1 -1 12 12">
+                                <path d="M0 5 C0 0 10 0 10 5 C10 10 5 10 5 8 C5 3 0 8 0 5"></path>
+                            </svg>
+                        </div>
+                        Freeline
+                    </div>
+                    <div class="dropdowntitle">Selection options</div>
+                    <div class="dropdownitem" onclick="selectAll()">
+                        <div class="dropdownicon">
+                            <svg viewBox="-1 -1 12 12">
+                                <rect x="0.5" y="0.5" width="9" height="9"></rect>
+                                <rect x="2.5" y="2.5" width="5" height="5" fill="#99f"></rect>
+                            </svg>
+                        </div>
+                        Select all
+                    </div>
+                </div>
+                <div id="righttools">
+                    <div class="tool standardtool" data-mode="crop">
+                        <svg viewBox="0 0 10 10">
+                            <path d="M1 3 l6 0 l0 6"></path>
+                            <path d="M3 1 l0 6 l6 0"></path>
+                            <path d="M2 8 L8 2" stroke-width="0.3"></path>
+                        </svg>
+                    </div>
+                    <div class="tool standardtool nofocus" data-mode="scale" onclick="openSizeOptions()">
+                        <svg viewBox="0 0 10 10">
+                            <rect x="1.5" y="1.5" width="4" height="4" fill="#ccf"></rect>
+                            <rect x="3.5" y="3.5" width="5" height="5" fill="#eef"></rect>
+                        </svg>
+                    </div>
+                    <div class="tool standardtool nofocus" data-mode="rotate" onclick="openDropdown(this,event,'rotdrop')">
+                        <svg viewBox="-1 -1 12 12">
+                            <path d="M0 8 L6 8 L6 5" fill="#aaf" stroke="none"></path>
+                            <path d="M7 8 L10 8 L7 2" class="blue"></path>
+                        </svg>
+                    </div>
+                    <div class="dropdown hidden" id="rotdrop">
+                        <div class="dropdownitem" onclick="flip('rot',90)">
+                            <div class="dropdownicon">
+                                <svg viewBox="-1 -1 12 12">
+                                    <path d="M4 8 L10 8 L4 5"></path>
+                                    <path d="M0 8 L3 8 L3 2" class="blue"></path>
+                                </svg>
+                            </div>
+                            Flip 90° clockwise
+                        </div>
+                        <div class="dropdownitem" onclick="flip('rot',-90)">
+                            <div class="dropdownicon">
+                                <svg viewBox="-1 -1 12 12">
+                                    <path d="M0 8 L6 8 L6 5"></path>
+                                    <path d="M7 8 L10 8 L7 2" class="blue"></path>
+                                </svg>
+                            </div>
+                            Flip 90° counter-clockwise
+                        </div>
+                        <div class="dropdownitem" onclick="flip('rot',180)">
+                            <div class="dropdownicon">
+                                <svg viewBox="-1 -1 12 12">
+                                    <path d="M1.5 2 L4.5 2 L4.5 8"></path>
+                                    <path d="M5.5 8 L8.5 8 L5.5 2" class="blue"></path>
+                                </svg>
+                            </div>
+                            Flip 180°
+                        </div>
+                        <div class="dropdownitem" onclick="flip('axis',[0,1])">
+                            <div class="dropdownicon">
+                                <svg viewBox="-1 -1 12 12">
+                                    <path d="M2 4.5 L8 4.5 L8 1.5"></path>
+                                    <path d="M2 5.5 L8 5.5 L8 8.5" class="blue"></path>
+                                </svg>
+                            </div>
+                            Flip horizontally
+                        </div>
+                        <div class="dropdownitem" onclick="flip('axis',[1,0])">
+                            <div class="dropdownicon">
+                                <svg viewBox="-1 -1 12 12">
+                                    <path d="M4.5 2 L4.5 8 L1.5 8"></path>
+                                    <path d="M5.5 8 L8.5 8 L5.5 2" class="blue"></path>
+                                </svg>
+                            </div>
+                            Flip vertically
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="spacer"></div>
+            <div class="extra hidden" id="selectitems">
+                
+            </div>
+            <div class="spacer"></div>
+            <div id="toolbox">
+                <div class="tool standardtool selected" data-mode="free">
+                    <svg viewBox="0 0 10 10">
+                        <path d="M 1 9 l2 0 l6 -6 l-2 -2 l-6 6 z" fill="#ccf"></path>
+                        <path d="M5.5 2.5 l2 2 l1.5 -1.5 l-2 -2 z" fill="#99f"></path>
+                    </svg>
+                </div>
+                <div class="tool standardtool" data-mode="fill">
+                    <svg viewBox="0 0 10 10">
+                        <path d="M 1 8 l2 -2 l2 3 l4 -3 l-3 -5 l-4 3 z" fill="#ccf"></path>
+                        <path d="M5 4 l-2 -3 l1 0 l1 1.1"></path>
+                    </svg>
+                </div>
+                <div class="tool standardtool" data-mode="text">
+                    <span style="font-family:serif; font-weight:bold; font-size:140%; color:#55f">A</span>
+                </div>
+                <div class="tool standardtool" data-mode="erase">
+                    <svg viewBox="0 0 10 10">
+                        <path d="M7 1 l2 3 l-1 2 l-5 3 l-2 -3 l1 -2 z" fill="#ccf"></path>
+                        <path d="M2 4 l2.67 4 L8 6 l-2.67 -4 z" fill="#99f"></path>
+                    </svg>
+                </div>
+                <div class="tool standardtool" data-mode="dropper">
+                    <svg viewBox="-0.5 -0.5 11 11">
+                        <path d="M 1 9 l1 0 l5 -5 l-1 -1 l-5 5 z" fill="#ccf"></path>
+                        <path d="M5 1 l0 2 l2 2 l2 0 l0 -1 l-1 -1 l1 -1 l-1 -1 l-1 1 l-1 -1 z" fill="#99f"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="spacer"></div>
+            <div id="shapebox">
+                <div class="tool" data-mode="path" data-maxpath="2" title="line">
+                    <svg viewBox="-3 -3 16 16">
+                        <path d="M0 0L10 10"></path>
+                    </svg>
+                </div>
+                <div class="tool" data-mode="path" data-maxpath="10000"  title="polygon">
+                    <svg viewBox="-3 -3 16 16">
+                        <path d="M0 0L2 10L8 10L10 5L5 5L4 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="spacer"></div>
+            <div class="extra" id="linebox">
+                <div class="bigbox" onclick="openLineSettings()">
+                    <div class="colwrapper">
+                        <div class="innerbox">
+                            <svg viewBox="-3 -3 42 42">
+                                <rect x="0" y="0" width="36" height="2"></rect>
+                                <rect x="0" y="6" width="36" height="4"></rect>
+                                <rect x="0" y="14" width="36" height="6"></rect>
+                                <rect x="0" y="24" width="36" height="12"></rect>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="coldesc">Set line</div>
+                </div>
+            </div>
+            <div class="spacer"></div>
+            <div class="extra hidden" id="tolerance">
+                <div class="bigbox" onclick="openTolerance()">
+                    <div class="colwrapper">
+                        <div class="innerbox">
+                            <svg viewBox="-3 -3 56 56">
+                                <rect width="50" height="50"></rect>
+                                <path id="triright" d="M50 50 L50 0 L0 50" fill="rgb(152,152,255)"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="coldesc">Set tolerance</div>
+                </div>
+            </div>
+            <div class="spacer"></div>
+            <div class="extra hidden" id="fontsettings">
+                <select id="fontsel"></select>
+                <br>
+                <select id="fontsize"></select>
+                <select id="fontstyle">
+                    <option value='["normal","normal"]'>normal</option>
+                    <option value='["bold","normal"]'>bold</option>
+                    <option value='["normal","italic"]'>italic</option>
+                    <option value='["bold","italic"]'>bold italic</option>
+                </select>
+            </div>
+            <div class="spacer"></div>
+            <div id="colorbar">
+                <div class="bigbox selected" onclick="setColInput(this,0)">
+                    <div class="colwrapper">
+                        <div class="raster"></div>
+                        <div id="maincol"></div>
+                    </div>
+                    <div class="coldesc">Color 1</div>
+                </div>
+                <div id="switchbox" onclick="switchColors()">
+                    <svg viewBox="-1 -1 17 12">
+                        <path d="M0 5 l5 -5 l0 3 l5 0 l0 -3 l5 5 l-5 5 l0 -3 l-5 0 l0 3 z"></path>
+                    </svg>
+                </div>
+                <div class="bigbox" onclick="setColInput(this,1)">
+                    <div class="colwrapper">
+                        <div class="raster"></div>
+                        <div id="secondcol"></div>
+                    </div>
+                    <div class="coldesc">Color 2</div>
+                </div>
+                <div id="boxwrapper"></div>
+                <div class="bigbox" id="colsel" onclick="openColorSelector()">
+                    <div class="colwrapper">
+                        <div class="raster"></div>
+                        <div id="rainbowwrapper">
+                            <div id="rainbow">
+                                <div class="shade"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="coldesc">Add</div>
+                </div>
+            </div>
+        </div>
+        <div id="viewbar" class="tooltab">
+            <div class="bigbox" onclick="openLineSettings()">
+                    <div class="colwrapper">
+                        <div class="innerbox">
+                            <svg viewBox="-3 -3 42 42">
+                                <rect x="0" y="0" width="36" height="2"></rect>
+                                <rect x="0" y="6" width="36" height="4"></rect>
+                                <rect x="0" y="14" width="36" height="6"></rect>
+                                <rect x="0" y="24" width="36" height="12"></rect>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="coldesc">Set line</div>
+                </div>
+        </div>
+        <canvas id="palette" style="display:none" width="30" height="1"></canvas>
+        <div id="maincontent">
+            <div class="rulerbox">
+                <canvas id="hor-ruler" width="20" height="20" class="ruler"></canvas>
+                <div id="ruler-line-hor"></div>
+            </div>
+            <div class="rulerbox">
+                <canvas id="vert-ruler" width="20" height="20" class="ruler"></canvas>
+                <div id="ruler-line-vert"></div>
+            </div>
+            <div id="rulernub"></div>
+            <div id="canvaswrapperwrapper">
+                <div id="canvaswrapper">
+                    <div id="resizemain" class="resizebox" data-backresize="false">
+                        <div class="moverect" data-direction="w" data-pos="3"></div>
+                        <div class="moverect" data-direction="wh" data-pos="4"></div>
+                        <div class="moverect" data-direction="h" data-pos="5"></div>
+                    </div>
+                    <canvas id="maincanvas" class="raster" width="600" height="400"></canvas>
+                    <canvas id="secondary" width="600" height="400"></canvas>
+                    <div id="drawcursor"></div>
+                    <div id="cursors">
+                        <svg id="cur_dropper" viewBox="-2 -2 14 14">
+                            <path d="M5 0 a5 5 180 0 1 0 10" stroke="white"></path>
+                            <path id="thiscol" d="M0 5 a5 5 180 0 1 10 0"></path>
+                            <path id="nowcol" d="M0 5 a5 5 180 0 0 10 0"></path>
+                            <circle cx="5" cy="5" r="6.4" stroke-width="1" stroke="#222"></circle>
+                            <circle cx="5" cy="5" r="4" stroke-width="0.2" stroke="#222"></circle>
+                            <path class="crosshair" d="M1 5 l3.5 0 m1 0 l3.5 0 M5 1 l0 3.5 m0 1 l0 3.5"></path>
+                            <path class="crosshair" d="M1 5 l3.5 0 m1 0 l3.5 0 M5 1 l0 3.5 m0 1 l0 3.5"></path>
+                        </svg>
+                        <svg id="cur_free" viewBox="-1 -1 12 12">
+                            <circle class="dotted" cx="5" cy="5" r="5"></circle>
+                            <circle class="dotted" cx="5" cy="5" r="5"></circle>
+                        </svg>
+                        <svg id="cur_erase" viewBox="-1 -1 12 12">
+                            <rect class="dotted" x="0" y="0" width="10" height="10"></rect>
+                            <rect class="dotted" x="0" y="0" width="10" height="10"></rect>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="infobar">
+            <div class="infoitem">
+                <svg class="infoicon" viewBox="-1 -1 12 12">
+                    <path d="M1 1 l2 7 l2 -2 l2 3 l2 -2 l-3 -2 l2 -2 z"></path>
+                </svg>
+                <span id="coords"></span>
+            </div>
+            <div class="infoitem">
+                <svg class="infoicon" viewBox="-1 -1 12 12">
+                    <rect x="2" y="1" width="7" height="6" stroke-dasharray="1.2"></rect>
+                    <path d="M0 1 l0 8"></path>
+                    <path d="M0 9 l10 0"></path>
+                </svg>
+                <span id="objsize"></span>
+            </div>
+            <div class="infoitem">
+                <svg class="infoicon" viewBox="-1 -1 12 12">
+                    <path d="M4 2 l6 0 l0 7 l-9 0 l0 -4"></path>
+                    <circle cx="1" cy="2" r="1"></circle>
+                </svg>
+                <span id="boxcoords"></span>
+            </div>
+            <div class="infoitem">
+                <svg class="infoicon" viewBox="-1 -1 12 12">
+                    <rect x="2" y="1" width="7" height="6"></rect>
+                    <path d="M0 1 l0 8"></path>
+                    <path d="M0 9 l10 0"></path>
+                </svg>
+                <span id="canvsize"></span>
+            </div>
+            <div class="infoitem" id="zoom">
+                <span id="zoomperc">100%</span>
+                <button onclick="scale(-1)">-</button>
+                <input id="zoomslider" type="range" min="0" max="10" value="3" step="1">
+                <button onclick="scale(1)">+</button>
+            </div>
+        </div>
+    </div>
+    <div id="popupwrapper">
+        <!--tolerance-->
+        <div class="popup" id="tolerancesettings">
+            <div class="popupheader">
+                <div class="popuptitle">Set fill tolerance</div>
+                <div class="closebtn" onclick="closePopup()">
+                    <svg viewBox="-4 -4 18 18">
+                        <path d="M0 0L10 10"></path>
+                        <path d="M0 10L10 0"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="popupcontent" style="max-width:250px">
+                <p>Low tolerance means only pixels with very similar color will be filled. High tolerance will accept similar pixels. The color box below approximates how similar colors can be.</p>
+                <div id="tolerancewrapper">
+                    <input id="tolslider" type="range" min="0" max="100">
+                    <div id="tolerancebox">
+                        <div id="tolright"></div>
+                        <div id="tolout"></div>
+                    </div>
+                    <button class="popupbtn" onclick="setTolerance()">Set tolerance</button>
+                </div>
+            </div>
+        </div>
+        <!--lines-->
+        <div class="popup" id="linesettings">
+            <div class="popupheader">
+                <div class="popuptitle">Set line width</div>
+                <div class="closebtn" onclick="closePopup()">
+                    <svg viewBox="-4 -4 18 18">
+                        <path d="M0 0L10 10"></path>
+                        <path d="M0 10L10 0"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="popupcontent" id="linewrapper">
+            </div>
+        </div>
+        <!--color-->
+        <div class="popup" id="colorselector">
+            <div class="popupheader">
+                <div class="popuptitle">Set color</div>
+                <div class="closebtn" onclick="closePopup()">
+                    <svg viewBox="-4 -4 18 18">
+                        <path d="M0 0L10 10"></path>
+                        <path d="M0 10L10 0"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="popupcontent">
+                <div id="shadewrapper" class="raster">
+                    <div id="shadebox">
+                        <div class="shade"></div>
+                    </div>
+                    <svg id="shadecursor" viewBox="0 0 10 10">
+                        <circle cx="5" cy="5" r="1.5"></circle>
+                        <path d="M6.5 5l3.5 0"></path>
+                        <path d="M0 5l3.5 0"></path>
+                        <path d="M5 0l0 3.5"></path>
+                        <path d="M5 6.5l0 3.5"></path>
+                    </svg>
+                </div>
+                <div id="hue" width="25" height="256">
+                    <div class="gradient" id="multicol"></div>
+                    <div id="huecur" class="slidecursor"></div>
+                </div>
+                <div id="transparency" class="raster">
+                    <div class="gradient" id="transp"></div>
+                    <div id="transcur" class="slidecursor"></div>
+                </div>
+                <div id="colright">
+                    <div id="resultbox" class="raster">
+                        <div id="colresult"></div>
+                    </div>
+                    <input type="number" min="0" max="255" class="rgbaval">
+                    <input type="number" min="0" max="255" class="rgbaval">
+                    <input type="number" min="0" max="255" class="rgbaval">
+                    <input type="number" min="0" max="255" class="rgbaval">
+                    <input type="text" spellcheck="false" id="hexout" class="rgbaval">
+                    <div id="bottombox">
+                        <button class="popupbtn" onclick="closePopup()">Cancel</button>
+                        <button class="popupbtn" onclick="addCol()">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="popup" id="sizesettings">
+            <div class="popupheader">
+                <div class="popuptitle">Set canvas size</div>
+                <div class="closebtn" onclick="closePopup()">
+                    <svg viewBox="-4 -4 18 18">
+                        <path d="M0 0L10 10"></path>
+                        <path d="M0 10L10 0"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="popupcontent">
+                <div class="inputrow">
+                    <label>Unit:</label>
+                    <input type="radio" checked id="perc" name="scaleunit">
+                    <label for="perc">Percent</label>
+                    <input type="radio" id="pix" name="scaleunit">
+                    <label for="pix">Pixels</label>
+                </div>
+                <div class="inputrow spaced">
+                    <span>Horizontal:</span>
+                    <input type="number" min="0" id="scalehor">
+                </div>
+                <div class="inputrow spaced">
+                    <span>Vertical:</span>
+                    <input type="number" min="0" id="scalevert">
+                </div>
+                <div class="inputrow">
+                    <input checked type="checkbox" id="preserve">
+                    <label for="preserve">Preserve image ratio</label>
+                </div>
+                <button onclick="confirmSize()" class="popupbtn">Confirm</button>
+            </div>
+        </div>
+        <div class="popup" id="saveopen">
+            <div class="popupheader">
+                <div class="popuptitle">Save as</div>
+                <div class="closebtn" onclick="closePopup()">
+                    <svg viewBox="-4 -4 18 18">
+                        <path d="M0 0L10 10"></path>
+                        <path d="M0 10L10 0"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="popupcontent">
+                <div id="fws" class="filewindow"></div>
+                <div class="inputwrapper">
+                    <input spellcheck="false" class="nameinput">
+                    <div class="errmsg"></div>
+                    <button class="popupbtn" onclick="pushSave(this.parentElement)">Save</button>
+                    <button class="popupbtn" onclick="openFile(this.parentElement)">Open</button>
+                </div>
+            </div>
+        </div>
+        <div class="popup" id="error">
+            <div class="popupheader">
+                <div class="popuptitle">Error</div>
+                <div class="closebtn" onclick="closePopup()">
+                    <svg viewBox="-4 -4 18 18">
+                        <path d="M0 0L10 10"></path>
+                        <path d="M0 10L10 0"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="popupcontent">
+                <div id="errorcontent"></div>
+            </div>
+        </div>
+    </div>
+    <!--MISC DWOPDOWNS-->
+    <div class="dropdown hidden" id="filedropdown">
+        <div class="dropdownitem">
+            <div class="dropdownicon">
+                <svg viewBox="-1 -1 12 12">
+                    <path d=""></path>
+                </svg>
+            </div>
+            <span>New</span>
+            <span class="hotkey-tip">Alt-N</span>
+        </div>
+        <div class="dropdownitem" onclick="openOpen()">
+            <div class="dropdownicon">
+                <svg viewBox="-1 -1 12 12">
+                    <path d=""></path>
+                </svg>
+            </div>
+            <span>Open</span>
+            <span class="hotkey-tip">Alt-O</span>
+        </div>
+        <div class="dropdownitem" onclick="save()">
+            <div class="dropdownicon">
+                <svg viewBox="-1 -1 12 12">
+                    <path d=""></path>
+                </svg>
+            </div>
+            <span>Save</span>
+            <span class="hotkey-tip">Alt-S</span>
+        </div>
+        <div class="dropdownitem" onclick="openSaveAs()">
+            <div class="dropdownicon">
+                <svg viewBox="-1 -1 12 12">
+                    <path d=""></path>
+                </svg>
+            </div>
+            <span>Save as</span>
+            <span class="hotkey-tip">Alt-Shift-S</span>
+        </div>
+        <div class="dropdownitem border">
+            <div class="dropdownicon">
+                <svg viewBox="-1 -1 12 12">
+                    <path d=""></path>
+                </svg>
+            </div>
+            <span>About PEPaint</span>
+        </div>
+    </div>
+    <!--BUFFERS-->
+    <div style="display:none">
+        <div id="filewrapper"></div>
+        <svg id="tabuffer" xmlns="http://www.w3.org/2000/svg" style="position:absolute">
+            <foreignObject style="width:100%; height:100%; position:absolute">
+                <textarea xmlns="http://www.w3.org/1999/xhtml" spellcheck="false" style="position: absolute; width: 100%; height: 100%; border: none; padding: 0; outline: none; background: transparent; resize: none; overflow: hidden"></textarea>
+            </foreignObject>
+        </svg>
+    </div>
+    <script src="script.js"></script>
+    <script src="https://picturelements.github.io/utils/fontlist.js"></script>
+</body>
+</html>
